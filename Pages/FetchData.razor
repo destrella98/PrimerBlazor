@@ -1,0 +1,52 @@
+﻿@page "/fetchdata"
+
+<PageTitle>Weather forecast</PageTitle>
+
+@using PrimerBlazor.Data
+@inject WeatherForecastService ForecastService
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (forecasts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Index</th>
+                <th>Date</th>
+                <th>Temp. (C)</th>
+                <th>Temp. (F)</th>
+                <th>Summary</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{int i=0;}
+            @foreach (var forecast in forecasts)
+            {
+                <tr>
+                    <td>@i</td>
+                    <td>@forecast.Date.ToShortDateString()</td>
+                    <td>@forecast.TemperatureC °c</td>
+                    <td>@forecast.TemperatureF °f</td>
+                    <td>@forecast.Summary</td>
+                </tr>
+                i++;
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private WeatherForecast[]? forecasts=null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+    }
+}

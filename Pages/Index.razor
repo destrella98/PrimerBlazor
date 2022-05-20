@@ -1,0 +1,65 @@
+﻿@page "/"
+
+<PageTitle>Calculadora</PageTitle>
+<form>
+<input type="text" disabled ="true" value=@operation style="margin-left:40.5% ;"/> 
+
+<br/><br/>
+<table class="table" style="width: 100px; margin: 0 auto;">
+    <tbody>
+        <tr>
+            <td><input type="button" value="1" @onclick='()=>Append("1")' class="btn-calc"></td>
+            <td><input type="button" value="2" @onclick='()=>Append("2")' class="btn-calc"></td>
+            <td><input type="button" value="3" @onclick='()=>Append("3")' class="btn-calc"></td>
+            <td><input type="button" value="+" @onclick='()=>Append("+")' class="btn btn-primary" style="width:38px ;"></td>
+        </tr>
+        <tr>
+            <td><input type="button" value="4" @onclick='()=>Append("4")' class="btn-calc"></td>
+            <td><input type="button" value="5" @onclick='()=>Append("5")' class="btn-calc"></td>
+            <td><input type="button" value="6" @onclick='()=>Append("6")' class="btn-calc"></td>
+            <td><input type="button" value="-" @onclick='()=>Append("-")' class="btn btn-primary" style="width:38px ;"></td>
+        </tr>
+        <tr>
+            <td><input type="button" value="7" @onclick='()=>Append("7")' class="btn-calc"></td>
+            <td><input type="button" value="8" @onclick='()=>Append("8")' class="btn-calc"></td>
+            <td><input type="button" value="9" @onclick='()=>Append("9")' class="btn-calc"></td>
+            <td><input type="button" value="*" @onclick='()=>Append("*")' class="btn btn-primary" style="width:38px ;"> </td>
+        </tr>
+        <tr>
+            <td><input type="button" value="C" @onclick="Clear" class="btn-calc"></td>
+            <td><input type="button" value="0" @onclick='()=>Append("0")' class="btn-calc"></td>
+            <td><input type="button" value="." @onclick='()=>Append(".")' class="btn-calc"></td>
+            <td><input type="button" value="/" @onclick='()=>Append("/")' class="btn btn-primary" style="width:38px ;"></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><input type="button" value="=" @onclick="Equal" class="btn btn-primary" style="width:38px ;"></td>
+        </tr>
+
+    </tbody>
+</table>
+<br/><br/>
+</form>
+
+@code{
+    private string operation="";
+    private void Append(string val){
+        operation=operation+val;
+    }
+
+    private void Clear(){
+        operation="";
+    }
+    private void Equal(){
+        Double result=Eval(operation);
+        operation=result.ToString().Replace(",",".");
+
+    }
+    static Double Eval(String expression)
+    {
+        System.Data.DataTable table = new System.Data.DataTable();
+        return Convert.ToDouble(table.Compute(expression, String.Empty));
+    }
+}

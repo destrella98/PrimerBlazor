@@ -1,0 +1,190 @@
+@page "/empleados"
+
+<PageTitle>Empleados</PageTitle>
+
+@using PrimerBlazor.Data
+@inject EmpleadosBDDService empleadosService
+@inject IJSRuntime JsRuntime
+
+@if (!edicion)
+{
+    <h1 style="text-align:center ;">Empleados</h1>
+    <div class="container">
+        <EditForm Model="@empleado" OnValidSubmit="@Agregar">
+            <div>
+                <label for="nombre" style="margin-right:5px ;">Nombre:</label>
+                <input type="text" id="nombre" name="nombre" placeholder="Nombre"  @bind-value="empleado.Nombre">
+            </div>
+    
+            <div>
+                <label for="apellido" style="margin-right:5px ;">Apellido:</label>
+                <input type="text" id="apellido" name="apellido" placeholder="Apellido" @bind-value="empleado.Apellido">
+            </div>
+
+            <div>
+                <label for="cargo" style="margin-right:19px ;">Cargo:</label>
+                <input type="text" id="cargo" name="cargo" placeholder="Cargo" @bind-value="empleado.Cargo">
+            </div>
+
+            <div>
+                <label for="salario" style="margin-right:12px ;">Salario:</label>
+                <input type="text" id="salario" name="salario" placeholder="Salario" @bind-value="empleado.Salario">
+            </div>
+
+            <div>
+                <input type="submit" class="btn btn-primary" style="margin-top: 10px; margin-left: 190px;" value="Agregar">
+            </div>
+        </EditForm>
+
+        @* <form class="form-group row">
+            <div>
+                <label for="nombre" style="margin-right:5px ;">Nombre:</label>
+                <input type="text" id="nombre" name="nombre" placeholder="Nombre"  @bind-value=@tbNombre @bind-value:event="oninput" >
+            </div>
+    
+            <div>
+                <label for="apellido" style="margin-right:5px ;">Apellido:</label>
+                <input type="text" id="apellido" name="apellido" placeholder="Apellido" @bind-value=@tbApellido @bind-value:event="oninput" >
+            </div>
+
+            <div>
+                <label for="cargo" style="margin-right:19px ;">Cargo:</label>
+                <input type="text" id="cargo" name="cargo" placeholder="Cargo" @bind-value=@tbCargo @bind-value:event="oninput" >
+            </div>
+
+            <div>
+                <label for="salario" style="margin-right:12px ;">Salario:</label>
+                <input type="text" id="salario" name="salario" placeholder="Salario" @bind-value=@tbSalario @bind-value:event="oninput" >
+            </div>
+
+            <div>
+                <input type="submit" class="btn btn-primary" style="margin-top: 10px; margin-left: 190px;" value="Agregar" @onclick="Agregar">
+            </div>
+
+        </form>       *@
+    </div>
+    <br/><br/>
+
+    <div class="container">
+        <div class="row">
+            <h1 style="text-align:center ;">Lista de Empleados</h1>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <td>#</td>
+                        <td>Nombre</td>
+                        <td>Apellido</td>
+                        <td>Cargo</td>
+                        <td>Salario</td>
+                        <td>Editar</td>
+                        <td>Eliminar</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{int i=1;}
+                    @foreach (var empleado in empleados)
+                    {
+                        int index=i-1;
+                    <tr>
+                        <td>@i</td>
+                        <td>@empleado.Nombre</td>
+                        <td>@empleado.Apellido</td>
+                        <td>@empleado.Cargo</td>
+                        <td>@empleado.Salario</td>
+                        <td><input type="button" value="Editar" @onclick="()=>Cambio(index,empleado)" class="btn btn-primary"></td>
+                        <td><input type="button" value="Eliminar" @onclick="()=>Eliminar(index)" class="btn btn-primary"></td>
+                    </tr>
+                    i++;
+                    }
+                </tbody>
+            </table>      
+        </div>
+    </div>
+}
+else
+{
+    <h1 style="text-align:center ;">Modificar Empleado</h1>
+    <div class="container">
+        <EditForm Model="@empleado" OnValidSubmit="@Editar">
+            <div>
+                <label for="nombre" style="margin-right:5px ;">Nombre:</label>
+                <input type="text" id="nombre" name="nombre" placeholder="Nombre"  @bind-value="empleado.Nombre">
+            </div>
+    
+            <div>
+                <label for="apellido" style="margin-right:5px ;">Apellido:</label>
+                <input type="text" id="apellido" name="apellido" placeholder="Apellido" @bind-value="empleado.Apellido">
+            </div>
+
+            <div>
+                <label for="cargo" style="margin-right:19px ;">Cargo:</label>
+                <input type="text" id="cargo" name="cargo" placeholder="Cargo" @bind-value="empleado.Cargo">
+            </div>
+
+            <div>
+                <label for="salario" style="margin-right:12px ;">Salario:</label>
+                <input type="text" id="salario" name="salario" placeholder="Salario" @bind-value="empleado.Salario">
+            </div>
+
+            <div>
+                <input type="button" class="btn btn-primary" style="margin-top: 10px; background-color:#dd1a1a; border-color:#dd1a1a" value="Cancelar" @onclick="Regresar">
+                <input type="submit" class="btn btn-primary" style="margin-top: 10px; margin-left: 88px;" value="Modificar">
+            </div>
+        </EditForm>
+    </div>
+}
+
+@code {
+    private List<Empleado>? empleados=null;
+    private Empleado empleado=new("","","",0);
+    private int idEdit;
+
+    private Boolean edicion=false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        empleadosService= new EmpleadosBDDService();
+        empleados = await empleadosService.ReadEmpleados();
+    }
+
+    private void Regresar()
+    {
+        edicion=false;
+    }
+
+    private void Cambio(int id,Empleado emp)
+    {
+        edicion=true;
+        idEdit=id;
+        empleado.Nombre=emp.Nombre;
+        empleado.Apellido=emp.Apellido;
+        empleado.Cargo=emp.Cargo;
+        empleado.Salario=emp.Salario;
+    }
+    private void Agregar()
+    {
+        empleadosService.CreateEmpleado(new Empleado(empleado.Nombre,empleado.Apellido,empleado.Cargo,empleado.Salario));
+        empleado.Nombre="";
+        empleado.Apellido="";
+        empleado.Cargo="";
+        empleado.Salario=0;
+    }
+
+    private void Editar()
+    {
+        empleadosService.UpdateEmpleado(idEdit,new Empleado(empleado.Nombre,empleado.Apellido,empleado.Cargo,empleado.Salario));
+        empleado.Nombre="";
+        empleado.Apellido="";
+        empleado.Cargo="";
+        empleado.Salario=0;
+        edicion=false;
+    }
+
+    private void Eliminar(int id)
+    {
+        empleadosService.DeleteEmpleado(id);
+    }
+    
+
+}
